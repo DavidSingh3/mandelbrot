@@ -1,8 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './components/App'
+import reportWebVitals from './reportWebVitals'
+import mandelbrot from './scripts/mandelbrot'
+import './styles/style.css'
+
+mandelbrot.init()
 
 ReactDOM.render(
   <React.StrictMode>
