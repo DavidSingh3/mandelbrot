@@ -6,17 +6,13 @@ const mandelbrot = {
     halfWidth: 0,
     halfHeight: 0,
     settings: {
-        mappingFactor: 0,
+        resolution: 2.5,
         maxIterations: 18,
-        resolution: 1.5,
-        offsetValueX: 0,
-        offsetValueY: 0,
         escapeRadius: 2,
     },
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             this.loadCanvas()
-            this.setMappingFactor()
             this.drawMandelbrot()
             this.addClickEvent()
         })
@@ -48,18 +44,15 @@ const mandelbrot = {
             }
             return this.rgb(0, 0, 0)
         },
-        getOffsetValueForAxis(axis) {
-            switch (axis) {
-                case 'x': return mandelbrot.settings.offsetValueX
-                case 'y': return mandelbrot.settings.offsetValueY
-                default: throw new Error('"axis" argument is required and should be either of "x" or "y"')
-            }
+        getMappingFactor(axis) {
+            const mappingFactor = Math.min(mandelbrot.halfWidth, mandelbrot.halfHeight) / mandelbrot.settings.resolution
+            return axis === 'y' ? -mappingFactor : mappingFactor
         },
         mapValueToCoordinate(axis, value) {
-            return mandelbrot.settings.mappingFactor * value + this.getOffsetValueForAxis(axis);
+            return Math.round((value * this.getMappingFactor(axis)))
         },
         mapCoordinateToValue(axis, coordinate) {
-            return coordinate / mandelbrot.settings.mappingFactor + this.getOffsetValueForAxis(axis);
+            return coordinate / this.getMappingFactor(axis)
         }
     },
     loadCanvas() {
@@ -70,9 +63,6 @@ const mandelbrot = {
         this.halfWidth = Math.floor(this.canvas.width / 2)
         this.halfHeight = Math.floor(this.canvas.height / 2)
         this.ctx.translate(this.halfWidth, this.halfHeight)
-    },
-    setMappingFactor() {
-        this.settings.mappingFactor = Math.min(this.halfWidth, this.halfHeight) / this.settings.resolution
     },
     drawMandelbrot() {
         for (let x = - this.halfWidth; x < this.halfWidth; x++) {
@@ -89,18 +79,13 @@ const mandelbrot = {
     },
     addClickEvent() {
         this.canvas.addEventListener('click', (event) => {
-            this.settings.offsetValueX = this.utils.mapCoordinateToValue('x', event.clientX - this.halfWidth)
-            this.settings.offsetValueY = this.utils.mapCoordinateToValue('y', event.clientY - this.halfHeight)
-            this.settings.resolution *= 0.1
-            this.settings.maxIterations += 50
-            this.setMappingFactor()
-            this.repaint()
+            // this.settings.offsetX += event.clientX - this.halfWidth
+            // this.settings.offsetY += event.clientY - this.halfHeight
+            this.settings.resolution *= 0.4
+            // this.settings.maxIterations += 20
+            this.drawMandelbrot()
         })
     },
-    repaint() {
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
-        this.drawMandelbrot()
-    }
 }
 
 window.mandelbrot = mandelbrot
